@@ -1,0 +1,42 @@
+dockerfile-base-pers
+
+dockerfile-base
+
+FROM ubuntu:24.04
+
+RUN apt-get update \
+	&& apt-get dist-upgrade -y \
+	&& apt-get autoremove -y \
+	&& apt-get autoclean -y \
+	&& apt-get install -y \
+	sudo \
+	nano \
+	wget \
+	curl \
+	git
+
+RUN useradd -G sudo -m -d /home/bruker -s /bin/bash -p "$(openssl passwd -1 PASSWD)" sigur
+
+USER sigur
+WORKDIR /home/sigur
+
+RUN mkdir hacking \
+	&& cd hacking \
+	&& curl -SL
+https://raw.githubusercontent.com/uia-worker/is105misc/master/sem01v24/pawned.sh > pawned.sh \
+	&& chmod 764 pawned.sh \
+	&& cd ..
+
+RUN git config [user]
+        email = sigurdmunkbrekke@gmail.com
+        name = sigurdbrekke
+		[url "https://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@github.com/"]
+        insteadOf = https://github.com/
+USER root
+RUN curl -SL https://go.dev/dl/go1.21.7.OS-ARCH.tar.gz \ | tar xvz -C /usr/local
+
+USER sigur
+SHELL ["/bin/bash", "-c"]
+RUN mkdir -p $HOME/go/{src,bin}
+ENV GOPATH="/home/BRUKER/go"
+ENV PATH="${PATH}:${GOPATH}/bin:/usr/local/go/bin"
